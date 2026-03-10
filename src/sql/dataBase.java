@@ -16,7 +16,7 @@ public class dataBase {
         try{
 //            Class.forName("com.mysql.jdbc.Driver");
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Conect = (Connection) DriverManager.getConnection("jdbc:mysql://127.0.0.1/mdsr","MORJAN","Moreno.880501");
+            Conect = (Connection) DriverManager.getConnection("jdbc:mysql://127.0.0.1/mdsr","MORJANDEV","Morjan*1025544889");
 //                JOptionPane.showMessageDialog(null, "Conectado a la Base de Datos !!!");
                 System.out.println("Conectado a la Base de Datos !!!");
         }catch(Exception e){

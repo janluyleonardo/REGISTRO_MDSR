@@ -29,6 +29,7 @@ public class VENTANA extends javax.swing.JFrame {
         this.setLocationRelativeTo(this);
         listar_depto(cbdepartamento);
         listar_carrera(cbCarrera);
+        modeloTablaDocente.addColumn("Id");
         modeloTablaDocente.addColumn("Nombre");
         modeloTablaDocente.addColumn("Apellido");
         modeloTablaDocente.addColumn("Documento");
@@ -121,12 +122,13 @@ public class VENTANA extends javax.swing.JFrame {
             
             rs = ps.executeQuery();
             while (rs.next()) {
-                String dato[] = new String[5];
-                dato[0] = rs.getString("Nom_Estudiante");
-                dato[1] = rs.getString("Ape_Estudiante");
-                dato[2] = String.valueOf(rs.getInt("Documento"));
-                dato[3] = rs.getString("Num_Telefonico");
-                dato[4] = rs.getString("Correo");
+                String dato[] = new String[6];
+                dato[0] = rs.getString("ID_Estudiante");
+                dato[1] = rs.getString("Nom_Estudiante");
+                dato[2] = rs.getString("Ape_Estudiante");
+                dato[3] = String.valueOf(rs.getInt("Documento"));
+                dato[4] = rs.getString("Num_Telefonico");
+                dato[5] = rs.getString("Correo");
                 modeloTablaDocente.addRow(dato);
             }
         } catch (Exception e) {
@@ -296,12 +298,10 @@ public class VENTANA extends javax.swing.JFrame {
         estadoGroup.add(ckbInactivo);
         ckbInactivo.setFont(new java.awt.Font("Comic Sans MS", 1, 12)); // NOI18N
         ckbInactivo.setText("Inactivo");
-        ckbInactivo.setOpaque(false);
 
         estadoGroup.add(ckbActivo);
         ckbActivo.setFont(new java.awt.Font("Comic Sans MS", 1, 12)); // NOI18N
         ckbActivo.setText("Activo");
-        ckbActivo.setOpaque(false);
 
         javax.swing.GroupLayout jPanelEstadoLayout = new javax.swing.GroupLayout(jPanelEstado);
         jPanelEstado.setLayout(jPanelEstadoLayout);
@@ -385,12 +385,10 @@ public class VENTANA extends javax.swing.JFrame {
         jornadaGroup.add(rbDiurno);
         rbDiurno.setFont(new java.awt.Font("Comic Sans MS", 1, 12)); // NOI18N
         rbDiurno.setText("Diurno");
-        rbDiurno.setOpaque(false);
 
         jornadaGroup.add(rbNocturno);
         rbNocturno.setFont(new java.awt.Font("Comic Sans MS", 1, 12)); // NOI18N
         rbNocturno.setText("Nocturno");
-        rbNocturno.setOpaque(false);
 
         javax.swing.GroupLayout jPanleGeneroLayout = new javax.swing.GroupLayout(jPanleGenero);
         jPanleGenero.setLayout(jPanleGeneroLayout);
@@ -590,12 +588,10 @@ public class VENTANA extends javax.swing.JFrame {
         generoGroup.add(rbmasculino);
         rbmasculino.setFont(new java.awt.Font("Comic Sans MS", 1, 12)); // NOI18N
         rbmasculino.setText("Masculino");
-        rbmasculino.setOpaque(false);
 
         generoGroup.add(rbFemenino);
         rbFemenino.setFont(new java.awt.Font("Comic Sans MS", 1, 12)); // NOI18N
         rbFemenino.setText("Femenino");
-        rbFemenino.setOpaque(false);
 
         javax.swing.GroupLayout jPanleGenero1Layout = new javax.swing.GroupLayout(jPanleGenero1);
         jPanleGenero1.setLayout(jPanleGenero1Layout);
@@ -624,9 +620,18 @@ public class VENTANA extends javax.swing.JFrame {
 
             },
             new String [] {
-
+                "Id", "Nombre", "Apellido", "Documento", "Teléfono", "Correo"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jtableRegistros.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
         jtableRegistros.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jtableRegistrosMouseClicked(evt);
@@ -902,13 +907,16 @@ public class VENTANA extends javax.swing.JFrame {
         System.exit(0);
     }//GEN-LAST:event_BTNSALIRActionPerformed
 
-    private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
-        validarDocumento();
+    private void cargarInformacion(String documento){
+        
+        if(documento.equals("")){
+            validarDocumento();
+        }
         String sqlBusqueda = "", generoDB = "", estadoDB = "", jornadaDB = "";
         sqlBusqueda = "SELECT * FROM estudiantes WHERE Documento = ?";
         try {
             ps = con.prepareStatement(sqlBusqueda);
-            ps.setInt(1, Integer.parseInt(txtDocumento.getText()));
+            ps.setInt(1, Integer.parseInt(documento));
 
             rs = ps.executeQuery();
 
@@ -945,7 +953,13 @@ public class VENTANA extends javax.swing.JFrame {
             }
 
         } catch (Exception e) {
+            System.out.println("Exceptionn tryCatch buscar registro estudiante: " + e);
         }
+    }
+    
+    private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
+        String documento = txtDocumento.getText();
+        cargarInformacion(documento);
     }//GEN-LAST:event_btnBuscarActionPerformed
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
@@ -1099,21 +1113,28 @@ public class VENTANA extends javax.swing.JFrame {
     }//GEN-LAST:event_BTNSALIR1ActionPerformed
 
     private void jtableRegistrosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jtableRegistrosMouseClicked
-        String datosMostrar="",Nombre="",Apellido="",Documento="",Telefono="",Correo="",Ciudad="";
-        Nombre = jtableRegistros.getValueAt(jtableRegistros.getSelectedRow(), 0).toString();
-        
-        Apellido = jtableRegistros.getValueAt(jtableRegistros.getSelectedRow(), 1).toString();
-        
-        Documento = jtableRegistros.getValueAt(jtableRegistros.getSelectedRow(), 2).toString();
-        
-        Telefono = jtableRegistros.getValueAt(jtableRegistros.getSelectedRow(), 3).toString();
-        
-        Correo = jtableRegistros.getValueAt(jtableRegistros.getSelectedRow(), 4).toString();
-        datosMostrar = "1. "+Nombre+" "+Apellido+"\n "
-                + "2. "+Documento+"\n "
-                + "3. "+Telefono+"\n "
-                + "4. "+Correo+"\n ";
-        JOptionPane.showMessageDialog(null, datosMostrar,"Datos seleccionados",JOptionPane.INFORMATION_MESSAGE);
+//        String datosMostrar="",Nombre="",Apellido="",Documento="",Telefono="",Correo="",id="";
+//        id = jtableRegistros.getValueAt(jtableRegistros.getSelectedRow(), 0).toString();
+//        txtId.setText(id);
+//        Nombre = jtableRegistros.getValueAt(jtableRegistros.getSelectedRow(), 1).toString();
+//        txtnombre.setText(Nombre);
+//        Apellido = jtableRegistros.getValueAt(jtableRegistros.getSelectedRow(), 2).toString();
+//        txtapellido.setText(Apellido);
+//        Documento = jtableRegistros.getValueAt(jtableRegistros.getSelectedRow(), 3).toString();
+//        txtDocumento.setText(Documento);
+//        Telefono = jtableRegistros.getValueAt(jtableRegistros.getSelectedRow(), 4).toString();
+//        System.out.println("id: " + id);
+//        Correo = jtableRegistros.getValueAt(jtableRegistros.getSelectedRow(), 5).toString();
+//        datosMostrar = "1. "+Nombre+" "+Apellido+"\n "
+//                + "2. "+Documento+"\n "
+//                + "3. "+Telefono+"\n "
+//                + "4. "+Correo+"\n ";
+//        JOptionPane.showMessageDialog(null, datosMostrar,"Datos seleccionados",JOptionPane.INFORMATION_MESSAGE);
+        DefaultTableModel RecordTable = (DefaultTableModel)jtableRegistros.getModel();
+        int selectedRows = jtableRegistros.getSelectedRow();
+        String Documento = RecordTable.getValueAt(selectedRows, 3).toString();
+        System.err.println(Documento);
+        cargarInformacion(Documento);
     }//GEN-LAST:event_jtableRegistrosMouseClicked
 
     private void cbCarreraItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cbCarreraItemStateChanged
